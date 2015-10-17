@@ -5,7 +5,7 @@ import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 /**
  * Created by 130017964 on 10/13/15.
  */
-public class HNode {
+public class HNode implements Comparable {
     // value for the NYT node
     public static final String NYT = "NYT";
     // value for the ROOT node
@@ -171,5 +171,12 @@ public class HNode {
 
     public void incrementWeight() {
         this.weight += 1;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int extOrder = ((HNode) o).getOrder();
+        int curOrder = getOrder();
+        return (curOrder < extOrder) ? -1 : (curOrder > extOrder) ? 1 : 0;
     }
 }
