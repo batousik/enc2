@@ -34,18 +34,29 @@ public class HTree {
         // if symbol is a new symbol
         if (pointer == null) {
             // add new node to the tree
-            addToTree(nytPointer, symbol);
+            this.addToTree(nytPointer, symbol);
             pointer = nytPointer;
+        } else {
+            if (!this.isMaxNumberInTheBlock(pointer)) {
+                pointer = this.switchNodeWithHighest(pointer);
+            }
         }
         pointer.incrementWeight();
-
-        updateTree(pointer);
+        this.updateBlockMap(pointer);
+        while (!pointer.isRoot()) {
+            pointer = pointer.getParent();
+            if (!this.isMaxNumberInTheBlock(pointer)) {
+                pointer = this.switchNodeWithHighest(pointer);
+            }
+            pointer.incrementWeight();
+            this.updateBlockMap(pointer);
+        }
         return "";
     }
 
-
     /**
      * This procedure allows to add new, not yet transmitted symbol to the tree.
+     *
      * @param nytPointer pointer to the NYT node
      * @param symbol     new, yet unseen symbol
      * @throws TreeOverflowException
@@ -61,10 +72,13 @@ public class HTree {
         // increment weights of the new external node
         nytPointer.getRight().incrementWeight();
         // update block map
-        this.addToBlockMap(nytPointer.getRight());
+        this.updateBlockMap(nytPointer.getRight());
     }
 
-    private void addToBlockMap(HNode node) {
+    /**
+     * @param node
+     */
+    private void updateBlockMap(HNode node) {
         int weight = node.getWeight();
         SortedArrayList<HNode> nodes;
         // check if block with this weight exists in the tree
@@ -74,7 +88,6 @@ public class HTree {
         } else {
             nodes = this.mapOfBlocks.get(weight);
         }
-
         // add node to sorted list
         nodes.addSorted(node);
 
@@ -86,38 +99,56 @@ public class HTree {
         }
     }
 
+    /**
+     * @param nodes
+     * @param node
+     */
     private void removeNodeFromListInMap(SortedArrayList<HNode> nodes, HNode node) {
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i).getOrder() == node.getOrder()) {
+                nodes.remove(i);
+                break;
+            }
+        }
     }
-
 
     /**
-     * @param pointer
+     * Procedure simply checks if the order of the node is the highest order
+     *
+     * @param node node to evaluate
+     * @return true if the node has the highest order in the block
+     */
+    private boolean isMaxNumberInTheBlock(HNode node) {
+        int weight = node.getWeight();
+        SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
+        return node.getOrder() > nodes.get(nodes.size() - 1).getOrder();
+    }
+
+    /**
+     * Procedure "swaps nodes" in the tree,
+     * according to algorithm current node is swapped with
+     * the highest order node in the same block
+     * procedure only has to swap values of nodes,
+     * actual nodes in the tree are kept.
+     *
+     * @param node node to be swapped with the highest node in the block
+     * @return node with same value but highest order in the block
+     */
+    private HNode switchNodeWithHighest(HNode node) {
+        int weight = node.getWeight();
+        String value = node.getValue();
+        SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
+        HNode higherNode = nodes.get(nodes.size() - 1);
+        node.setValue(higherNode.getValue());
+        higherNode.setValue(value);
+        return higherNode;
+    }
+
+    /**
+     * @param symbol
      * @return
      */
-    private boolean isMaxNumberInTheBlock(HNode pointer) {
-        //TODO: fix this
-        return (pointer.getLeft().getWeight() + pointer.getRight().getWeight()) <= pointer.getWeight();
-    }
-
-    private void switchNodeWithHighest(HNode pointer) {
-
-    }
-
-    private void updateTree(HNode newNode) {
-
-    }
-
     private HNode getPointer(String symbol) {
         return this.mapOfNodes.get(symbol);
     }
-
-    private boolean isSiblingOfZERONode(HNode pointer) {
-        return true;
-        //return pointer.getParent().getLeft().getValue() == HNode.ZERO_NODE_VAL || pointer.getParent().getLeft().getValue() == HNode.ZERO_NODE_VAL;
-    }
-
-    private void slideAndIncrement(HNode pointer) {
-
-    }
-
 }
