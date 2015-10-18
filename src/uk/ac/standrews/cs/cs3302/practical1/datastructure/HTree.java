@@ -68,8 +68,8 @@ public class HTree {
         } else {
             nytPointer.setValue(HNode.INNER);
         }
-        nytPointer.setRight(new HNode(nytPointer, symbol));
-        nytPointer.setLeft(new HNode(nytPointer));
+        nytPointer.setRight(new HNode(nytPointer, symbol, false));
+        nytPointer.setLeft(new HNode(nytPointer, true));
         // update node map
         this.mapOfNodes.put(HNode.NYT, nytPointer.getLeft());
         this.mapOfNodes.put(symbol, nytPointer.getRight());
@@ -150,10 +150,7 @@ public class HTree {
      * @return node with same value but highest order in the block
      */
     private HNode switchNodeWithHighest(HNode node, HNode higherNode) {
-        System.out.println(node);
-        System.out.println(higherNode);
         String value = node.getValue();
-        //int tempWeight = node.getWeight();
         HNode tempLeft = node.getLeft();
         HNode tempRight = node.getRight();
         node.setValue(higherNode.getValue());
@@ -163,7 +160,6 @@ public class HTree {
         higherNode.setValue(value);
         higherNode.setRight(tempRight);
         higherNode.setLeft(tempLeft);
-        //higherNode.setWeight(tempWeight);
         // for each child of swapped nodes if they exist, update their parent
         if (higherNode.getLeft() != null)
             higherNode.getLeft().setParent(node);
@@ -178,18 +174,27 @@ public class HTree {
         * we are swapping nodes in the same block
         * and don't change orders
         */
-        System.out.println(mapOfBlocks.get(node.getWeight()));
-        System.out.println(node);
-        System.out.println(higherNode);
-        System.out.println();
         this.mapOfNodes.put(node.getValue(), node);
         this.mapOfNodes.put(higherNode.getValue(), higherNode);
+        // check if nodes are swapped as children
+        HNode parentHigher = higherNode.getParent();
+        HNode parentNode = node.getParent();
+        if (parentHigher.getLeft() != null && parentHigher.getLeft().equals(higherNode))
+            higherNode.setIsLeftChild(true);
+        else
+            higherNode.setIsLeftChild(false);
+        if (parentNode.getLeft() != null && parentNode.getLeft().equals(node))
+            node.setIsLeftChild(true);
+        else
+            node.setIsLeftChild(false);
+
+
         return higherNode;
     }
 
     /**
-     * @param symbol
-     * @return
+     * @param symbol as key to the map
+     * @return returns pointer to the HNode of it exists with a given symbol
      */
     private HNode getPointer(String symbol) {
         return this.mapOfNodes.get(symbol);
@@ -197,6 +202,15 @@ public class HTree {
 
     public void print() {
         this.huffmanTree.print();
+    }
+
+    public String getCodeRepr(String s) {
+        HNode p = mapOfNodes.get(s);
+        return p.getCodeRepr();
+    }
+
+    public boolean symbolExist(String s) {
+        return this.getPointer(s) != null;
     }
 
     @Override

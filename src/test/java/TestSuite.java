@@ -2,8 +2,11 @@ package test.java;
 
 import org.junit.Test;
 import uk.ac.standrews.cs.cs3302.practical1.datastructure.HNode;
+import uk.ac.standrews.cs.cs3302.practical1.datastructure.HTree;
 import uk.ac.standrews.cs.cs3302.practical1.datastructure.SortedArrayList;
+import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -43,4 +46,14 @@ public class TestSuite {
         assertTrue(hNode3.compareTo(hNode4) == 1);
     }
 
+    @Test
+    public void testEncoderPattern() throws TreeOverflowException {
+        HTree huffmanTree = new HTree(257);
+        String test = "abracadabra";
+        String[] testArr = test.split("");
+        for (int i = 1; i < testArr.length; i++) {
+            huffmanTree.acceptSymbol(testArr[i]);
+        }
+        assertEquals("1000", huffmanTree.getCodeRepr("d"));
+    }
 }

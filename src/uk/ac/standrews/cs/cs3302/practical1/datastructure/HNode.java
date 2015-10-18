@@ -31,7 +31,7 @@ public class HNode implements Comparable {
     private boolean isRoot = false;
     private boolean isNYT = false;
     private int level = 0;
-
+    private boolean isLeftChild;
     /**
      * Constructor for the first node, to initialise the tree
      *
@@ -53,10 +53,12 @@ public class HNode implements Comparable {
      * Constructor for NYT node, not yet transmitted
      *
      * @param parent a parent of this new node
+     * @param isLeftChild whether a child is a left child
      */
-    public HNode(HNode parent) throws TreeOverflowException {
+    public HNode(HNode parent, boolean isLeftChild) throws TreeOverflowException {
         // NYT node has zero weight
         this.weight = 0;
+        this.isLeftChild = isLeftChild;
         this.value = HNode.NYT;
         this.order = this.getNextOrder();
         this.left = null;
@@ -69,11 +71,13 @@ public class HNode implements Comparable {
      * Constructor for the leaf node, that carries
      * one of the values from the given alphabet to encode
      *
-     * @param value  value of the symbol from the alphabet
      * @param parent parent node of this node
+     * @param value  value of the symbol from the alphabet
+     * @param isLeftChild whether a child is a left child
      */
-    public HNode(HNode parent, String value) throws TreeOverflowException {
+    public HNode(HNode parent, String value, boolean isLeftChild) throws TreeOverflowException {
         this.weight = 0;
+        this.isLeftChild = isLeftChild;
         this.value = value;
         this.order = this.getNextOrder();
         this.left = null;
@@ -98,10 +102,6 @@ public class HNode implements Comparable {
         this.left = left;
         this.right = right;
         this.parent = parent;
-    }
-
-    private static void breadthTraversal(HNode root) {
-
     }
 
     /**
@@ -178,6 +178,20 @@ public class HNode implements Comparable {
         return isNYT;
     }
 
+    public void setIsLeftChild(boolean isLeftChild) {
+        this.isLeftChild = isLeftChild;
+    }
+
+    public String getCodeRepr() {
+        String code = "";
+        HNode pointer = this;
+        while (!pointer.isRoot()) {
+            code = (pointer.isLeftChild ? "0" : "1") + code;
+            pointer = pointer.getParent();
+        }
+        return code;
+    }
+
     public int getLevel() {
         if (isRoot())
             return this.level;
@@ -230,5 +244,17 @@ public class HNode implements Comparable {
             before += this.getRight().getOrder() + "|";
         }
         return before + "(" + this.getOrder() + "-" + this.getWeight() + ")" + more;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final HNode other = (HNode) obj;
+        return this.getOrder() == other.getOrder();
     }
 }

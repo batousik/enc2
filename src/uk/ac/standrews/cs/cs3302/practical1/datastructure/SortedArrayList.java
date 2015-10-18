@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Created by utug on 10/17/15.
+ * Created by 130017964 on 10/17/15.
  */
 public class SortedArrayList<T> extends ArrayList<T> {
     @SuppressWarnings("unchecked")
