@@ -37,17 +37,17 @@ public class HTree {
             this.addToTree(nytPointer, symbol);
             pointer = nytPointer;
         } else {
-            if (!this.isMaxNumberInTheBlock(pointer)) {
-                pointer = this.switchNodeWithHighest(pointer);
-            }
+            HNode higherNode = this.isNotMaxNumberInTheBlockAndIsMaxNotParent(pointer);
+            if (higherNode != null)
+                pointer = this.switchNodeWithHighest(pointer, higherNode);
         }
         pointer.incrementWeight();
         this.updateBlockMap(pointer);
         while (!pointer.isRoot()) {
             pointer = pointer.getParent();
-            if (!this.isMaxNumberInTheBlock(pointer)) {
-                pointer = this.switchNodeWithHighest(pointer);
-            }
+            HNode higherNode = this.isNotMaxNumberInTheBlockAndIsMaxNotParent(pointer);
+            if (higherNode != null)
+                pointer = this.switchNodeWithHighest(pointer, higherNode);
             pointer.incrementWeight();
             this.updateBlockMap(pointer);
         }
@@ -63,9 +63,13 @@ public class HTree {
      */
     private void addToTree(HNode nytPointer, String symbol) throws TreeOverflowException {
         // NYT gives birth to new NYT and new "External Node"
-        nytPointer.setValue("");
-        nytPointer.setLeft(new HNode(nytPointer));
+        if (nytPointer.isRoot()) {
+            nytPointer.setValue(HNode.ROOT);
+        } else {
+            nytPointer.setValue(HNode.INNER);
+        }
         nytPointer.setRight(new HNode(nytPointer, symbol));
+        nytPointer.setLeft(new HNode(nytPointer));
         // update node map
         this.mapOfNodes.put(HNode.NYT, nytPointer.getLeft());
         this.mapOfNodes.put(symbol, nytPointer.getRight());
@@ -113,34 +117,73 @@ public class HTree {
     }
 
     /**
-     * Procedure simply checks if the order of the node is the highest order
+     * Procedure checks if the order of the node is the highest order
+     * and if not highest also checks if the highest order is not parent of the node
      *
      * @param node node to evaluate
-     * @return true if the node has the highest order in the block
+     * @return higher node if the node doesn't have the highest order in the block and highest order is not parent
+     * null otherwise
      */
-    private boolean isMaxNumberInTheBlock(HNode node) {
+    private HNode isNotMaxNumberInTheBlockAndIsMaxNotParent(HNode node) {
         int weight = node.getWeight();
         SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
-        return node.getOrder() > nodes.get(nodes.size() - 1).getOrder();
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            HNode n = nodes.get(i);
+            if (n.getOrder() <= node.getOrder())
+                return null;
+            if (n.getOrder() != node.getParent().getOrder())
+                return n;
+        }
+        return null;
     }
+
 
     /**
      * Procedure "swaps nodes" in the tree,
      * according to algorithm current node is swapped with
      * the highest order node in the same block
      * procedure only has to swap values of nodes,
-     * actual nodes in the tree are kept.
+     * actual nodes in the tree are kept, to keep orders right
      *
-     * @param node node to be swapped with the highest node in the block
+     * @param node       node to be swapped with the highest node in the block
+     * @param higherNode highestNode with which we swap
      * @return node with same value but highest order in the block
      */
-    private HNode switchNodeWithHighest(HNode node) {
-        int weight = node.getWeight();
+    private HNode switchNodeWithHighest(HNode node, HNode higherNode) {
+        System.out.println(node);
+        System.out.println(higherNode);
         String value = node.getValue();
-        SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
-        HNode higherNode = nodes.get(nodes.size() - 1);
+        //int tempWeight = node.getWeight();
+        HNode tempLeft = node.getLeft();
+        HNode tempRight = node.getRight();
         node.setValue(higherNode.getValue());
+        node.setLeft(higherNode.getLeft());
+        node.setRight(higherNode.getRight());
+        node.setWeight(higherNode.getWeight());
         higherNode.setValue(value);
+        higherNode.setRight(tempRight);
+        higherNode.setLeft(tempLeft);
+        //higherNode.setWeight(tempWeight);
+        // for each child of swapped nodes if they exist, update their parent
+        if (higherNode.getLeft() != null)
+            higherNode.getLeft().setParent(node);
+        if (higherNode.getRight() != null)
+            higherNode.getRight().setParent(node);
+        if (tempRight != null)
+            tempRight.setParent(higherNode);
+        if (tempLeft != null)
+            tempLeft.setParent(higherNode);
+        /* also update map of nodes
+        * map of blocks doesn't need to be updated since
+        * we are swapping nodes in the same block
+        * and don't change orders
+        */
+        System.out.println(mapOfBlocks.get(node.getWeight()));
+        System.out.println(node);
+        System.out.println(higherNode);
+        System.out.println();
+        this.mapOfNodes.put(node.getValue(), node);
+        this.mapOfNodes.put(higherNode.getValue(), higherNode);
         return higherNode;
     }
 
@@ -150,5 +193,14 @@ public class HTree {
      */
     private HNode getPointer(String symbol) {
         return this.mapOfNodes.get(symbol);
+    }
+
+    public void print() {
+        this.huffmanTree.print();
+    }
+
+    @Override
+    public String toString() {
+        return "";
     }
 }

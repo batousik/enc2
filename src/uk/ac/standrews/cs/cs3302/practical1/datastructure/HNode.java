@@ -2,6 +2,9 @@ package uk.ac.standrews.cs.cs3302.practical1.datastructure;
 
 import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Created by 130017964 on 10/13/15.
  */
@@ -10,6 +13,8 @@ public class HNode implements Comparable {
     public static final String NYT = "NYT";
     // value for the ROOT node
     public static final String ROOT = "ROOT";
+    // value for the inner node
+    public static final String INNER = "INNER";
 
     private static int currOrder;
     // actual data piece
@@ -25,6 +30,7 @@ public class HNode implements Comparable {
     private HNode parent;
     private boolean isRoot = false;
     private boolean isNYT = false;
+    private int level = 0;
 
     /**
      * Constructor for the first node, to initialise the tree
@@ -34,7 +40,7 @@ public class HNode implements Comparable {
     public HNode(int alphabetSize) throws TreeOverflowException {
         initialiseOrderCount(alphabetSize);
         this.order = this.getNextOrder();
-        this.value = null;
+        this.value = HNode.ROOT;
         this.weight = 0;
         this.left = null;
         this.right = null;
@@ -51,7 +57,7 @@ public class HNode implements Comparable {
     public HNode(HNode parent) throws TreeOverflowException {
         // NYT node has zero weight
         this.weight = 0;
-        this.value = null;
+        this.value = HNode.NYT;
         this.order = this.getNextOrder();
         this.left = null;
         this.right = null;
@@ -94,6 +100,10 @@ public class HNode implements Comparable {
         this.parent = parent;
     }
 
+    private static void breadthTraversal(HNode root) {
+
+    }
+
     /**
      * Initialises the max number of nodes that could exist in this tree
      *
@@ -111,7 +121,6 @@ public class HNode implements Comparable {
         currOrder -= 1;
         return toReturn;
     }
-
 
     public String getValue() {
         return value;
@@ -169,8 +178,30 @@ public class HNode implements Comparable {
         return isNYT;
     }
 
+    public int getLevel() {
+        if (isRoot())
+            return this.level;
+        return this.getParent().getLevel() + 1;
+    }
+
     public void incrementWeight() {
         this.weight += 1;
+    }
+
+    public void print() {
+        Queue<HNode> queue = new LinkedList<>();
+        queue.add(this);
+        int prevLevel = 0;
+        while (!queue.isEmpty()) {
+            HNode node = queue.remove();
+            if (prevLevel < node.getLevel()) {
+                System.out.println("");
+                prevLevel = node.getLevel();
+            }
+            System.out.print(node + "    ");
+            if (node.left != null) queue.add(node.left);
+            if (node.right != null) queue.add(node.right);
+        }
     }
 
     @Override
@@ -178,5 +209,26 @@ public class HNode implements Comparable {
         int extOrder = ((HNode) o).getOrder();
         int curOrder = getOrder();
         return (curOrder < extOrder) ? -1 : (curOrder > extOrder) ? 1 : 0;
+    }
+
+    @Override
+    public String toString() {
+        String more = "";
+        if (this.getValue() != null) {
+            if (!this.getValue().equals("")) {
+                more = "\"" + this.getValue() + "\"";
+            }
+        }
+        String before = "";
+        if (!this.isRoot()) {
+            before = this.getParent().getOrder() + "^";
+        }
+        if (this.getLeft() != null) {
+            before += this.getLeft().getOrder() + "|";
+        }
+        if (this.getRight() != null) {
+            before += this.getRight().getOrder() + "|";
+        }
+        return before + "(" + this.getOrder() + "-" + this.getWeight() + ")" + more;
     }
 }
