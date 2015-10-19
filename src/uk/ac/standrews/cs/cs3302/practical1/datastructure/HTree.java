@@ -5,7 +5,8 @@ import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 import java.util.HashMap;
 
 /**
- * Created by 130017964 on 10/15/15.
+ * Created by 130017964 on 10/13/15.
+ * Huffman Tree implementation
  */
 
 public class HTree {
@@ -14,7 +15,8 @@ public class HTree {
     private HashMap<Integer, SortedArrayList<HNode>> mapOfBlocks;
 
     /**
-     * @param alphabetSize
+     * default constructor
+     * @param alphabetSize size of the inforamtion source alphabet
      * @throws TreeOverflowException
      */
     public HTree(int alphabetSize) throws TreeOverflowException {
@@ -80,7 +82,8 @@ public class HTree {
     }
 
     /**
-     * @param node
+     * Block map contains weights, when weight is increased node has to be moved into different place in this map
+     * @param node node to move up a level
      */
     private void updateBlockMap(HNode node) {
         int weight = node.getWeight();
@@ -104,8 +107,9 @@ public class HTree {
     }
 
     /**
-     * @param nodes
-     * @param node
+     * Helper procedure
+     * @param nodes Arraylist from which to remove
+     * @param node node to remove
      */
     private void removeNodeFromListInMap(SortedArrayList<HNode> nodes, HNode node) {
         for (int i = 0; i < nodes.size(); i++) {
@@ -125,14 +129,18 @@ public class HTree {
      * null otherwise
      */
     private HNode isNotMaxNumberInTheBlockAndIsMaxNotParent(HNode node) {
-        int weight = node.getWeight();
-        SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
-        for (int i = nodes.size() - 1; i >= 0; i--) {
-            HNode n = nodes.get(i);
-            if (n.getOrder() <= node.getOrder())
-                return null;
-            if (n.getOrder() != node.getParent().getOrder())
-                return n;
+        try {
+            int weight = node.getWeight();
+            SortedArrayList<HNode> nodes = mapOfBlocks.get(weight);
+            for (int i = nodes.size() - 1; i >= 0; i--) {
+                HNode n = nodes.get(i);
+                if (n.getOrder() <= node.getOrder())
+                    return null;
+                if (n.getOrder() != node.getParent().getOrder())
+                    return n;
+            }
+        } catch (NullPointerException ignored) {
+
         }
         return null;
     }
@@ -200,8 +208,11 @@ public class HTree {
         return this.mapOfNodes.get(symbol);
     }
 
-    public void print() {
-        this.huffmanTree.print();
+    /**
+     * Method allows to getStringRepresentation huffman tree in more or less human understandable representation
+     */
+    public String getStringRepresentation() {
+        return this.huffmanTree.print();
     }
 
     public String getCodeRepr(String s) {
@@ -213,8 +224,32 @@ public class HTree {
         return this.getPointer(s) != null;
     }
 
+    public String getNodeWithPath(String code) {
+        String symbol;
+        HNode pointer = this.huffmanTree;
+        try {
+            char[] path = code.toCharArray();
+            for (char aPath : path) {
+                if (aPath == '0')
+                    pointer = pointer.getLeft();
+                else
+                    pointer = pointer.getRight();
+            }
+            symbol = pointer.getValue();
+        } catch (NullPointerException npe) {
+            // symbol is root
+            symbol = HNode.ROOT;
+        }
+        return symbol;
+    }
+
     @Override
     public String toString() {
         return "";
+    }
+
+    public String getNYTCode() {
+        HNode pointer = this.mapOfNodes.get("NYT");
+        return pointer.getCodeRepr();
     }
 }

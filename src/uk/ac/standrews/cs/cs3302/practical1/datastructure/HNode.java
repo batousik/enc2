@@ -7,6 +7,7 @@ import java.util.Queue;
 
 /**
  * Created by 130017964 on 10/13/15.
+ * Class implements a Huffman Node
  */
 public class HNode implements Comparable {
     // value for the NYT node
@@ -29,8 +30,6 @@ public class HNode implements Comparable {
     private HNode right;
     private HNode parent;
     private boolean isRoot = false;
-    private boolean isNYT = false;
-    private int level = 0;
     private boolean isLeftChild;
     /**
      * Constructor for the first node, to initialise the tree
@@ -46,7 +45,6 @@ public class HNode implements Comparable {
         this.right = null;
         this.parent = null;
         this.isRoot = true;
-        this.isNYT = true;
     }
 
     /**
@@ -64,7 +62,6 @@ public class HNode implements Comparable {
         this.left = null;
         this.right = null;
         this.parent = parent;
-        this.isNYT = true;
     }
 
     /**
@@ -142,10 +139,6 @@ public class HNode implements Comparable {
         return order;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
     public HNode getLeft() {
         return left;
     }
@@ -174,14 +167,16 @@ public class HNode implements Comparable {
         return isRoot;
     }
 
-    public boolean isNYT() {
-        return isNYT;
-    }
-
     public void setIsLeftChild(boolean isLeftChild) {
         this.isLeftChild = isLeftChild;
     }
 
+    /**
+     * Method that traverses the tree to get code representation of a symbol
+     * translates left/right vertice to 0/1
+     *
+     * @return code for symbol
+     */
     public String getCodeRepr() {
         String code = "";
         HNode pointer = this;
@@ -194,7 +189,7 @@ public class HNode implements Comparable {
 
     public int getLevel() {
         if (isRoot())
-            return this.level;
+            return 0;
         return this.getParent().getLevel() + 1;
     }
 
@@ -202,24 +197,29 @@ public class HNode implements Comparable {
         this.weight += 1;
     }
 
-    public void print() {
+    /**
+     * Prints more or less human readable tree representation
+     */
+    public String print() {
+        String tree = "";
         Queue<HNode> queue = new LinkedList<>();
         queue.add(this);
         int prevLevel = 0;
         while (!queue.isEmpty()) {
             HNode node = queue.remove();
             if (prevLevel < node.getLevel()) {
-                System.out.println("");
+                tree += "\n";
                 prevLevel = node.getLevel();
             }
-            System.out.print(node + "    ");
+            tree += node + "\t";
             if (node.left != null) queue.add(node.left);
             if (node.right != null) queue.add(node.right);
         }
+        return tree;
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(@SuppressWarnings("NullableProblems") Object o) {
         int extOrder = ((HNode) o).getOrder();
         int curOrder = getOrder();
         return (curOrder < extOrder) ? -1 : (curOrder > extOrder) ? 1 : 0;

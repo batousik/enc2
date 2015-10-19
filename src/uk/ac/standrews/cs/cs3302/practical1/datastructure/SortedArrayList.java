@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Created by 130017964 on 10/17/15.
+ * Created by 130017964 on 10/13/15.
+ * Arraylist that keeps values sorted using insertion sort
  */
 public class SortedArrayList<T> extends ArrayList<T> {
     @SuppressWarnings("unchecked")

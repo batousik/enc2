@@ -4,13 +4,19 @@ import org.junit.Test;
 import uk.ac.standrews.cs.cs3302.practical1.datastructure.HNode;
 import uk.ac.standrews.cs.cs3302.practical1.datastructure.HTree;
 import uk.ac.standrews.cs.cs3302.practical1.datastructure.SortedArrayList;
+import uk.ac.standrews.cs.cs3302.practical1.encoder.HuffmanStringCoder;
+import uk.ac.standrews.cs.cs3302.practical1.encoder.HuffmanStringDecoder;
+import uk.ac.standrews.cs.cs3302.practical1.encoder.HuffmanStringEncoder;
 import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by 130017964 on 10/17/15.
+ * Created by 130017964 on 10/13/15.
+ * Main Test suit for the practical
  */
 public class TestSuite {
 
@@ -54,6 +60,32 @@ public class TestSuite {
         for (int i = 1; i < testArr.length; i++) {
             huffmanTree.acceptSymbol(testArr[i]);
         }
-        assertEquals("1000", huffmanTree.getCodeRepr("d"));
+        assertEquals("1001", huffmanTree.getCodeRepr("d"));
+    }
+
+    @Test
+    public void testHuffmanCoder() throws TreeOverflowException, IOException {
+        final String data = "A !\"#$%&'()*+,-./0123456789:;<=>?@ABCD" +
+                "EFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|" +
+                "}~139r87yAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        HuffmanStringEncoder he = new HuffmanStringEncoder(data);
+        he.encode();
+        HuffmanStringDecoder hd = new HuffmanStringDecoder(he.getEncodedText(), "out.txt");
+        hd.decode();
+        assertEquals(data, hd.getDecodedData());
+    }
+
+    @Test
+    public void testAllowedAlphabet() {
+        final String symbols = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+        String toCollect = "";
+        int counter = 0;
+        for (int i = HuffmanStringCoder.ALPHABET_ASCII_START_CODE; i <= HuffmanStringCoder.ALPHABET_ASCII_END_CODE; i++) {
+            toCollect += String.valueOf(Character.toChars(i));
+            counter++;
+        }
+        System.out.println("SYMBOLS: " + counter);
+        assertEquals(toCollect, symbols);
+
     }
 }
