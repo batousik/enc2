@@ -70,20 +70,26 @@ public class HuffmanStringCoder {
      * @return code representation of a char
      */
 
-    public String getCodeForNewChar(String s) {
-        int k = this.mapOfCharsToPos.get(s);
-        int numOfBits;
-        String codeForNewChar;
-        if (1 <= k && k <= 2 * r) {
-            numOfBits = e + 1;
-            codeForNewChar = Integer.toBinaryString(k - 1);
-            while (codeForNewChar.length() < numOfBits)
-                codeForNewChar = 0 + codeForNewChar;
-        } else {
-            numOfBits = e;
-            codeForNewChar = Integer.toBinaryString(k - r - 1);
-            while (codeForNewChar.length() < numOfBits)
-                codeForNewChar = 0 + codeForNewChar;
+    public String getCodeForNewChar(String s) throws Exception {
+        String codeForNewChar = null;
+        try {
+            int k = this.mapOfCharsToPos.get(s);
+            int numOfBits;
+
+            if (1 <= k && k <= 2 * r) {
+                numOfBits = e + 1;
+                codeForNewChar = Integer.toBinaryString(k - 1);
+                while (codeForNewChar.length() < numOfBits)
+                    codeForNewChar = 0 + codeForNewChar;
+            } else {
+                numOfBits = e;
+                codeForNewChar = Integer.toBinaryString(k - r - 1);
+                while (codeForNewChar.length() < numOfBits)
+                    codeForNewChar = 0 + codeForNewChar;
+            }
+        } catch (NullPointerException npe) {
+            System.err.println("ERROR FOR CHARACTER: [" + s + "] " + s.getBytes());
+            throw new Exception(npe);
         }
         return codeForNewChar;
     }

@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3302.practical1.encoder;
 
-import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 import uk.ac.standrews.cs.cs3302.practical1.io.FileReader;
 
 import java.io.IOException;
@@ -43,7 +42,7 @@ public class HuffmanStringEncoder extends HuffmanStringCoder {
         this.dataArr = this.data.split("");
     }
 
-    public void encode() throws TreeOverflowException {
+    public void encode() throws Exception {
         for (int i = 0; i < dataArr.length; i++) {
             String s = dataArr[i];
             if (s == null || s.length() == 0)

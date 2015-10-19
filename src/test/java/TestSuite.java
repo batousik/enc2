@@ -9,8 +9,6 @@ import uk.ac.standrews.cs.cs3302.practical1.encoder.HuffmanStringDecoder;
 import uk.ac.standrews.cs.cs3302.practical1.encoder.HuffmanStringEncoder;
 import uk.ac.standrews.cs.cs3302.practical1.exceptions.TreeOverflowException;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -64,7 +62,7 @@ public class TestSuite {
     }
 
     @Test
-    public void testHuffmanCoder() throws TreeOverflowException, IOException {
+    public void testHuffmanCoder() throws Exception {
         final String data = "A !\"#$%&'()*+,-./0123456789:;<=>?@ABCD" +
                 "EFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|" +
                 "}~139r87yAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
